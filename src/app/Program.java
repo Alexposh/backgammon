@@ -13,8 +13,13 @@ import service.GameService;
 public class Program {
 
 	
+	
 	private static boolean canMove(Player player, Move move) {
-		
+//		if(move.getEnd() > 23 || move.getEnd() < 0) {
+//			
+//		}
+		// if(List<Spot> .indexOf(3))
+//		if(player.getOtherPlayer().get indexOf(move.getEnd()))
 //		setOrMovePiece
 		// bringFromHell
 		// senttoHeaven

@@ -69,21 +69,18 @@ public class Player {
 
 		return filteredResult;
 	}
-	
+
 	public List<Spot> higherSpotsWithChips(Spot spotToStop) {
 		List<Spot> chipsOnHigherSpots = new ArrayList<>();
 		List<Spot> spotsWithChips = new ArrayList<>();
-		
 
-				
-		for(Spot spot : chipsOnHigherSpots) {
-			
-			if( spot.getContainedChips().size() != 0 && getColor() == spot.getContainedChips().get(0).getColor()) {
-				
+		for (Spot spot : chipsOnHigherSpots) {
+
+			if (spot.getContainedChips().size() != 0 && getColor() == spot.getContainedChips().get(0).getColor()) {
+
 				spotsWithChips.add(spot);
 			}
-			
-		
+
 		}
 		return spotsWithChips;
 	}
@@ -142,14 +139,15 @@ public class Player {
 	public List<Move> getMyOptions(RollResult rollResult) {
 		RollResult rollResultOK = new RollResult();
 		List<Die> diceResultOK = new ArrayList<>();
-		for(Die die : rollResult.getDiceResult()) {
-			if(die.isAvailable()) {
+		for (Die die : rollResult.getDiceResult()) {
+			if (die.isAvailable()) {
 				diceResultOK.add(die);
 			}
 		}
 		rollResultOK.setDiceResult(diceResultOK);
-		
+
 		List<Spot> spotsWithMyChips = new ArrayList<>();
+		List<Spot> spotsWithEnemyChips = new ArrayList<>();
 		List<Chip> chipsInHell = new ArrayList<Chip>();
 
 		chipsInHell = hell;
@@ -157,9 +155,13 @@ public class Player {
 		List<Move> movesAvailable = new ArrayList<>();
 
 		for (Spot spotChecked : theBoard) {
-			if (spotChecked.getContainedChips().size() > 0
-					&& spotChecked.getContainedChips().get(0).getColor() == color) {
-				spotsWithMyChips.add(spotChecked);
+			if (spotChecked.getContainedChips().size() > 0) {
+				if (spotChecked.getContainedChips().get(0).getColor() == color) {
+					spotsWithMyChips.add(spotChecked);
+				} else {
+					spotsWithEnemyChips.add(spotChecked);
+				}
+
 			}
 		}
 
@@ -170,7 +172,12 @@ public class Player {
 				Spot theSpot = getOtherPlayer().getHouseInOrderHellRelated().get(die.getValue() - 1);
 				String optionFound = ("You can move from hell " + " to spot " + (theBoard.indexOf(theSpot)));
 				optionsFound.add(optionFound);
-				movesAvailable.add(new Move(null, theBoard.indexOf(theSpot) ));
+				if (spotsWithEnemyChips.contains(theSpot) && theSpot.getContainedChips().size() > 1) {
+					// do nothing
+					System.out.println("[Debug] Enemy lives there");
+				} else {
+					movesAvailable.add(new Move(null, theBoard.indexOf(theSpot)));
+				}
 
 			}
 			return movesAvailable;
@@ -181,42 +188,67 @@ public class Player {
 		// heaven logic starts here
 		List<Spot> spotsWithChipsOutOfBase = getSpotsOutOfBaseWithMyChips();// new ArrayList<>();
 		List<Spot> spotsWithChipsInMyBase = getHouseInOrderHellRelated();// new ArrayList<>();
-		for (Die die : rollResultOK.getDiceResult()) {
-			if (spotsWithChipsOutOfBase.size() == 0) {
+		if (spotsWithChipsOutOfBase.size() == 0) {
+			for (Die die : rollResultOK.getDiceResult()) {
+
 				for (Spot spot : spotsWithChipsInMyBase) {
-					// Spot theSpot = getOtherPlayer().getHouseInOrderHellRelated().get(die.getValue() - 1);
-					if (die.getValue() ==  getHouseInOrderHellRelated().indexOf(spot) + 1) { // getHouseInOrderHellRelated()
+					Spot endSpot = null;
+					try {
+						endSpot = theBoard.get((theBoard.indexOf(spot))
+								+ (this.color.equals("RED") ? -die.getValue() : die.getValue()));
+					} catch (Exception e) {
+						// if we try to get the spot from out of bounds (theBoard)
+						System.out.println("[Debug] endpoint is off the board");
+					}
+					// getOtherPlayer().getHouseInOrderHellRelated().get(die.getValue() - 1);
+					if (die.getValue() == getHouseInOrderHellRelated().indexOf(spot) + 1) { // getHouseInOrderHellRelated()
 						String optionFound = ("You can move with die " + die.getValue() + " to heaven from spot "
 								+ (theBoard.indexOf(spot)));
 						optionsFound.add(optionFound);
-						movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot) + (this.color.equals("RED") ?  -die.getValue() : die.getValue())));
+						movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot)
+								+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
 					}
-					
+
 					if (die.getValue() < getHouseInOrderHellRelated().indexOf(spot) + 1) {
 						// theBoard
 						String optionFound = ("You can move with die " + die.getValue() + "  from spot "
-								+ (theBoard.indexOf(spot)) + " to spot " + ((theBoard.indexOf(spot)) + (this.color.equals("RED") ?  -die.getValue() : die.getValue())));
-						optionsFound.add(optionFound);
-						movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot) + (this.color.equals("RED") ?  -die.getValue() : die.getValue())));
+								+ (theBoard.indexOf(spot)) + " to spot " + ((theBoard.indexOf(spot))
+										+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
+
+						if (endSpot != null && spotsWithEnemyChips.contains(endSpot)
+								&& endSpot.getContainedChips().size() > 1) {
+							// do nothing
+							System.out.println("[Debug] Enemy lives there");
+						} else {
+							optionsFound.add(optionFound);
+							movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot)
+									+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
+						}
+
 					}
-					
+
 					if (die.getValue() > getHouseInOrderHellRelated().indexOf(spot) + 1) {
 
 						// intricate stuff
-						if(higherSpotsWithChips(spot).size() > 0) {
-							String optionFound = ("You cannot move from this spot "+theBoard.indexOf(spot)+" until you clear higher spots");
+						if (higherSpotsWithChips(spot).size() > 0) {
+							String optionFound = ("You cannot move from this spot " + theBoard.indexOf(spot)
+									+ " until you clear higher spots");
 							optionsFound.add(optionFound);
-							movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot) + (this.color.equals("RED") ?  -die.getValue() : die.getValue())));
-						}else {
-						
+							movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot)
+									+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
+						} else {
+
 							String optionFound = ("You can move with die " + die.getValue() + " to heaven from spot "
 									+ (theBoard.indexOf(spot)));
 							optionsFound.add(optionFound);
-							movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot) + (this.color.equals("RED") ?  -die.getValue() : die.getValue())));
+							movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot)
+									+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
 						}
 					}
 				}
+				return movesAvailable;
 			}
+
 		}
 
 		// heaven logic ends here
@@ -226,18 +258,37 @@ public class Player {
 		for (Die die : rollResultOK.getDiceResult()) {
 
 			for (Spot spot : spotsWithMyChips) {
-				String optionFound = ("You can move from spot " + (theBoard.indexOf(spot)) + " to spot "
-						+ ((theBoard.indexOf(spot)) + (this.color.equals("RED") ?  -die.getValue() : die.getValue())));
-				optionsFound.add(optionFound);
-				movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot) + (this.color.equals("RED") ?  -die.getValue() : die.getValue())));
+				Spot endSpot = null;
+				try {
+					endSpot = theBoard.get(
+							(theBoard.indexOf(spot)) + (this.color.equals("RED") ? -die.getValue() : die.getValue()));
+				} catch (Exception e) {
+					// if we try to get the spot from out of bounds (theBoard)
+					System.out.println("[Debug] endpoint is off the board");
+				}
+
+				if (endSpot != null && spotsWithEnemyChips.contains(endSpot)
+						&& endSpot.getContainedChips().size() > 1) {
+					// do nothing
+					System.out.println("[Debug] Enemy lives there");
+				} else {
+					String optionFound = ("You can move from spot " + (theBoard.indexOf(spot)) + " to spot "
+							+ ((theBoard.indexOf(spot))
+									+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
+					if (endSpot != null) {
+						optionsFound.add(optionFound);
+						movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot)
+								+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
+					}
+
+				}
 
 			}
 
+			// board moves logic ends here
 		}
-
-		// board moves logic ends here
-
 		return movesAvailable;
+
 	}
 
 	// }
