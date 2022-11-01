@@ -13,7 +13,7 @@ public class Player {
 	private List<Chip> heaven = new ArrayList<>();
 	private List<Chip> hell = new ArrayList<>();
 	private List<Spot> theBoard = null;
-	private String color;
+	private String color; // "RED", "WHITE"
 	private Player otherPlayer;
 	private int houseFrom;
 
@@ -176,7 +176,10 @@ public class Player {
 					// do nothing
 					System.out.println("[Debug] Enemy lives there");
 				} else {
-					movesAvailable.add(new Move(null, theBoard.indexOf(theSpot)));
+					// enemy size - 1 => BRING_FROM_HELL_AND_SEND_ENEMY_PIECE_TO_HELL
+					// no enemy => BRING_FROM_HELL
+					boolean sendEnemyToHell = theSpot.getContainedChips().size() == 1 && theSpot.getContainedChips().get(0).getColor().equals(this.getOtherPlayer().getColor());
+					movesAvailable.add(new Move(null, theBoard.indexOf(theSpot), die, sendEnemyToHell ?  MoveType.BRING_FROM_HELL_AND_SEND_ENEMY_PIECE_TO_HELL : MoveType.BRING_FROM_HELL));
 				}
 
 			}
@@ -206,7 +209,7 @@ public class Player {
 								+ (theBoard.indexOf(spot)));
 						optionsFound.add(optionFound);
 						movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot)
-								+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
+								+ (this.color.equals("RED") ? -die.getValue() : die.getValue()), die, MoveType.SEND_PIECE_TO_HEAVEN));
 					}
 
 					if (die.getValue() < getHouseInOrderHellRelated().indexOf(spot) + 1) {
@@ -221,8 +224,11 @@ public class Player {
 							System.out.println("[Debug] Enemy lives there");
 						} else {
 							optionsFound.add(optionFound);
+							// either board to board OR board to board and take enemy piece !!!!!!!!!!    fill this in as TODO
+							/// on the board || on the board and send enemy piece to hell
+							boolean sendEnemyToHell = endSpot.getContainedChips().size() == 1 && endSpot.getContainedChips().get(0).getColor().equals(this.getOtherPlayer().getColor());
 							movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot)
-									+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
+									+ (this.color.equals("RED") ? -die.getValue() : die.getValue()), die, sendEnemyToHell ? MoveType.ON_THE_BOARD_AND_SEND_ENEMY_PIECE_TO_HELL : MoveType.ON_THE_BOARD));
 						}
 
 					}
@@ -234,15 +240,15 @@ public class Player {
 							String optionFound = ("You cannot move from this spot " + theBoard.indexOf(spot)
 									+ " until you clear higher spots");
 							optionsFound.add(optionFound);
-							movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot)
-									+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
+//							movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot)
+//									+ (this.color.equals("RED") ? -die.getValue() : die.getValue()), die));
 						} else {
 
 							String optionFound = ("You can move with die " + die.getValue() + " to heaven from spot "
 									+ (theBoard.indexOf(spot)));
 							optionsFound.add(optionFound);
 							movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot)
-									+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
+									+ (this.color.equals("RED") ? -die.getValue() : die.getValue()), die, MoveType.SEND_PIECE_TO_HEAVEN));
 						}
 					}
 				}
@@ -277,8 +283,10 @@ public class Player {
 									+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
 					if (endSpot != null) {
 						optionsFound.add(optionFound);
+						
+						boolean sendEnemyToHell = endSpot.getContainedChips().size() == 1 && endSpot.getContainedChips().get(0).getColor().equals(this.getOtherPlayer().getColor());
 						movesAvailable.add(new Move(theBoard.indexOf(spot), theBoard.indexOf(spot)
-								+ (this.color.equals("RED") ? -die.getValue() : die.getValue())));
+								+ (this.color.equals("RED") ? -die.getValue() : die.getValue()), die, sendEnemyToHell ? MoveType.ON_THE_BOARD_AND_SEND_ENEMY_PIECE_TO_HELL : MoveType.ON_THE_BOARD));
 					}
 
 				}
