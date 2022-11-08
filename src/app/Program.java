@@ -1,7 +1,5 @@
 package app;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -12,6 +10,8 @@ import model.RollResult;
 import model.Spot;
 import service.AbstractStrategy;
 import service.GameService;
+import service.MoveStrategyFactory;
+import service.MoveStrategyOnBoardAndSendEnemyPieceToHell;
 import service.MoveStrategyOnTheBoard;
 
 public class Program {
@@ -66,15 +66,27 @@ public class Program {
 			// move = send piece to heaven
 			// bring from hell to board
 			
-			AbstractStrategy moveStrategy = new MoveStrategyOnTheBoard(player, selectedMove);
+//			AbstractStrategy moveStrategy = null;// = new MoveStrategyOnTheBoard(player, selectedMove);
+//			
+//			if(selectedMove.getMoveType() == MoveType.ON_THE_BOARD) {
+//				moveStrategy = new MoveStrategyOnTheBoard(player, selectedMove);
+//			}else if(selectedMove.getMoveType() == MoveType.ON_THE_BOARD_AND_SEND_ENEMY_PIECE_TO_HELL) {
+//				moveStrategy = new MoveStrategyOnBoardAndSendEnemyPieceToHell(player, selectedMove);
+//			}
 			
 			
+			// Vehicle vehicle = null;
+			// if(type == "car"){
+				// vehicle = new Car();
+//			}
+			// Vehicle vehicle = VehicleFactory.createVehicle("car");
 			
+			AbstractStrategy moveStrategy = MoveStrategyFactory.createMoveStrategy(player, selectedMove);
+			moveStrategy.makeMove();
 			
-			
-			if(selectedMove.getMoveType() == MoveType.ON_THE_BOARD) {
-				GameService.setOrMovePiece(player.getTheBoard().get(fromSpot).getContainedChips(), selectedMove.getEnd(), player.getTheBoard());
-			}
+//			if(selectedMove.getMoveType() == MoveType.ON_THE_BOARD) {
+//				GameService.setOrMovePiece(player.getTheBoard().get(fromSpot).getContainedChips(), selectedMove.getEnd(), player.getTheBoard());
+//			}
 			//takeAction();
 			
 			
