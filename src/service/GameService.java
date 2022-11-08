@@ -62,6 +62,14 @@ public class GameService {
 	// setOrMovePiece(list6, 8, board);
 	// TODO: Create sendPieceToHeaven / sendPierceToEnemyHell
 
+	
+	/**
+	 * Method for sending a piece to heaven
+	 * @param board 
+	 * @param spotIndex the spot from where we move the piece
+	 * @param playerDestination the player containing the 'correct' heaven
+	 * @return
+	 */
 	public static boolean sendPieceToPlayerHeaven(List<Spot> board, int spotIndex, Player playerDestination) {
 		Spot clearedSpot = board.get(spotIndex);
 		Chip clearedChip = clearedSpot.getContainedChips().get(0);

@@ -10,7 +10,8 @@ public class MoveStrategyFromHellToBoardAndSendEnemyToHell extends AbstractStrat
 
 	@Override
 	public void makeMove() {
-		GameService.bringPlayerPieceFromHell(player.getTheBoard(), player, move.getEnd());
+		
 		GameService.sendEnemyPieceToHell(player.getTheBoard(), move.getEnd(), player.getOtherPlayer());
+		GameService.bringPlayerPieceFromHell(player.getTheBoard(), player, move.getEnd());
 	}
 }

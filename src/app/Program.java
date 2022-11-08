@@ -57,7 +57,7 @@ public class Program {
 			int optionIndex = scan.nextInt();
 			Move selectedMove = optionsAvailable.get(optionIndex);
 			//
-			int fromSpot = selectedMove.getInitial();
+//			int fromSpot = selectedMove.getInitial();
 			
 			// move = on the board
 			
