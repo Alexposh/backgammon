@@ -71,18 +71,26 @@ public class Player {
 	}
 
 	public List<Spot> higherSpotsWithChips(Spot spotToStop) {
-		List<Spot> chipsOnHigherSpots = new ArrayList<>();
-		List<Spot> spotsWithChips = new ArrayList<>();
+		List<Spot> houseInOrderHellRelated = this.getHouseInOrderHellRelated();
+		List<Spot> chipsOnHigherSpots = new ArrayList<>(); // []
+		
+		int indexOfSpot = houseInOrderHellRelated.indexOf(spotToStop);
+		for(int i = houseInOrderHellRelated.size() - 1; i > indexOfSpot; i--) {
+			chipsOnHigherSpots.add(houseInOrderHellRelated.get(i));
+		}
+		
+		
+		List<Spot> spotsWithChips = new ArrayList<>(); // []
 
 		for (Spot spot : chipsOnHigherSpots) {
 
-			if (spot.getContainedChips().size() != 0 && getColor() == spot.getContainedChips().get(0).getColor()) {
+			if (spot.getContainedChips().size() != 0 && getColor().equals(spot.getContainedChips().get(0).getColor())) {
 
 				spotsWithChips.add(spot);
 			}
 
 		}
-		return spotsWithChips;
+		return spotsWithChips; // []
 	}
 
 	public List<Spot> countChipsOnHigherSpots(int spotSelected) {
@@ -135,7 +143,6 @@ public class Player {
 		return numberFrom1To6;
 	}
 
-	// public List<Move> getMyOptions(...
 	public List<Move> getMyOptions(RollResult rollResult) {
 		RollResult rollResultOK = new RollResult();
 		List<Die> diceResultOK = new ArrayList<>();
@@ -190,7 +197,15 @@ public class Player {
 
 		// heaven logic starts here
 		List<Spot> spotsWithChipsOutOfBase = getSpotsOutOfBaseWithMyChips();// new ArrayList<>();
-		List<Spot> spotsWithChipsInMyBase = getHouseInOrderHellRelated();// new ArrayList<>();
+		// List<Spot> spotsWithChipsInMyBase = getHouseInOrderHellRelated();// new ArrayList<>(); // [0,1,2,3,4,5]
+		// spotsWithChipsInMyBase -> remove all the empty / enemy spots
+		List<Spot> spotsWithChipsInMyBase = new ArrayList<>();
+		for(Spot spot : getHouseInOrderHellRelated()) {
+			if(spot.getContainedChips().size() > 0 && spot.getContainedChips().get(0).getColor().equals(this.color)) {
+				spotsWithChipsInMyBase.add(spot);
+			}
+		}
+		
 		if (spotsWithChipsOutOfBase.size() == 0) {
 			for (Die die : rollResultOK.getDiceResult()) {
 
@@ -224,6 +239,7 @@ public class Player {
 							System.out.println("[Debug] Enemy lives there");
 						} else {
 							optionsFound.add(optionFound);
+							System.out.println("ROLL RESULT: " + rollResult);
 							// either board to board OR board to board and take enemy piece !!!!!!!!!!    fill this in as TODO
 							/// on the board || on the board and send enemy piece to hell
 							boolean sendEnemyToHell = endSpot.getContainedChips().size() == 1 && endSpot.getContainedChips().get(0).getColor().equals(this.getOtherPlayer().getColor());
@@ -252,8 +268,9 @@ public class Player {
 						}
 					}
 				}
-				return movesAvailable;
+				
 			}
+			return movesAvailable;
 
 		}
 

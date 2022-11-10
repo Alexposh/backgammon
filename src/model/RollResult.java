@@ -21,6 +21,11 @@ public class RollResult {
 	public void setDiceResult(List<Die> diceResult) {
 		this.diceResult = diceResult;
 	}
+
+	@Override
+	public String toString() {
+		return "RollResult [diceResult=" + diceResult + "]";
+	}
 	
 	
 	

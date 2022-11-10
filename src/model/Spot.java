@@ -15,6 +15,11 @@ public class Spot {
 	public void setContainedChips(List<Chip> containedChips) {
 		this.containedChips = containedChips;
 	}
+
+	@Override
+	public String toString() {
+		return "Spot [containedChips=" + containedChips + "]";
+	}
 	
 	
 	

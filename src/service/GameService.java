@@ -1,5 +1,9 @@
 package service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +76,11 @@ public class GameService {
 	 */
 	public static boolean sendPieceToPlayerHeaven(List<Spot> board, int spotIndex, Player playerDestination) {
 		Spot clearedSpot = board.get(spotIndex);
+		
+		System.out.println("CLEARED SPOT INDEX: " + spotIndex);
+		System.out.println("CLEARED SPOT: " + clearedSpot);
 		Chip clearedChip = clearedSpot.getContainedChips().get(0);
+		
 		clearedSpot.getContainedChips().remove(clearedChip);
 		playerDestination.getHeaven().add(clearedChip);
 		return true;
@@ -160,6 +168,34 @@ public class GameService {
 		}
 		System.out.println("entire board populated");
 	}
+	
+	public static List<Spot> populateBoardFromFile(){
+		List<Spot> board = createBoard();
+		List<String> linesFromFile = new ArrayList<>();
+		try {
+			
+			 linesFromFile = Files.readAllLines(Paths.get("C:\\Users\\alexp\\eclipse-workspace\\Table\\src\\service\\board_config_test_heaven.txt"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("COULD NOT FIND board_config.txt");
+		}
+//		String line1 = linesFromFile.get(0); // "0-W-2"
+		// setPiece
+		for(String line : linesFromFile) {
+			String elements[] = line.split("-"); // elements[0] = "0" elements[1] = "W" elements[2] = "2"
+//			if(elements[1].equals("W")) {
+//				Chip chip = new Chip("WHITE");
+//			}
+			Chip chip = elements[1].equals("W") ? new Chip("WHITE") : new Chip("RED");
+			
+			int nrPieces = Integer.valueOf(elements[2]);
+			for(int i=0; i<nrPieces; i++) {
+				setPiece(chip, Integer.valueOf(elements[0]), board);
+			}
+		}
+		return board;
+	}
 
 	public static List<Spot> populateBoard() {
 		List<Spot> board = createBoard();
@@ -223,6 +259,12 @@ public class GameService {
 
 	}
 
+	
+	public static void setPiece(Chip chip, int to, List<Spot> board) {
+		Spot spotOnTheBoard = board.get(to);
+		spotOnTheBoard.getContainedChips().add(chip);
+	}
+	
 	public static void setOrMovePiece(List<Chip> from, int to, List<Spot> board) {
 		Spot spotOnTheBoard = board.get(to);
 		Chip theFirstChip = from.get(0);

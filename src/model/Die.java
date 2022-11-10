@@ -17,6 +17,10 @@ public class Die {
 	public void setAvailable(boolean available) {
 		this.available = available;
 	}
+	@Override
+	public String toString() {
+		return "Die [value=" + value + ", available=" + available + "]";
+	}
 	
 	
 	
